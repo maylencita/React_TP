@@ -28,7 +28,7 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
 
   render(){
     return (
-      <Layout {...this.props}>
+      <Layout {...this.props} activeChannel={this.props.channel}>
         <div className="messages_container">
           <div className="messages_body">
             <div className="message_list_scroll">
@@ -55,7 +55,10 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
 
   sendMessage = (event: any) => {
     event.preventDefault();
-
+    this.props.onQuestionAsked(this.props.channel.name,this.state.currentMessage)
+    this.setState({
+      currentMessage:''
+    })
     //@todo
   }
 

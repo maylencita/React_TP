@@ -11,7 +11,8 @@ import './index.css';
 import Home from './views/home'
 import Messages from './views/messages'
 import NewChannel from './views/newChannel'
-import { Channel, DefaultChannel, User, DefaultUser } from './models'
+import { Channel, DefaultChannel, User, DefaultUser, Question, Answer } from './models'
+import { unwatchFile } from 'fs';
 
 interface AppState {
   users: Array<User>
@@ -78,14 +79,40 @@ class App extends React.Component<AppProps, AppState> {
 
   addChannel = (channelName: string) => {    
     //@TODO
+    let newChannel = {name: channelName, questions:[] as Question[]}
+    this.setState({
+      channels:[...this.state.channels, newChannel]
+    })
   } 
 
   addQuestion = (channelId: string, questionText: string) => {
     //@TODO
-  }
+    let updateChannel = (id:string,user:User,channel:Channel) =>({
+      ...channel,
+      questions:[...channel.questions, {
+        id,
+        user,
+        content:questionText,
+        answers:[] as Answer[]
+      }]
+    })
+      let channel= this.state.channels.find(c=>c.name===channelId)
+      if(channel && this.state.user){
+        let user =this.state.user
+        let id :string = `q${channel.questions.length+1}`
+        let updateChannels: Channel[] = this.state.channels.map(channel => {
+          return channel.name === channelId ? updateChannel(id,user, channel):channel
+        })
+        this.setState({
+          channels:updateChannels
+        })
+      }
+    }  
+  
 
   answerQuestion = (channelId: string, questionId: string, content: string) => {
     //@TODO
+    
   }
 
   toggleAnswerMode = (activeQuestion: string) => {
