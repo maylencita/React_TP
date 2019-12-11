@@ -1,27 +1,67 @@
 import * as React from 'react'
+import Layout from '../layout'
 
-const APP_NAME = 'Chit Chat'
+import QuestionBlock from '../components/question'
+import MessageInput from '../components/messageInput'
+import { Channel, Question } from '../models'
 
-const messages = () => {
-  return (
-    <div className="container">
-      <div className="sideBar">
-        <div className="sideBar_title">
-          <h1>{APP_NAME}</h1>
-        </div>
-        <div className="sideBar_channels">
-          <h2 className="sideBar_channels_title">
-            Channels <span className="addButton sideBar_channels_add">+</span>
-          </h2>
-          <div className="sideBar_channel sideBar_channels_link"># channel 1</div>
-          <div className="sideBar_channel sideBar_channels_link"># channel 2</div>
-        </div>  
-      </div>
-      <div className="homeContainer">
-        TODO : display messages
-      </div>  
-    </div>
-  )   
+interface MessagesProps {
+  appName: string,
+  channel: Channel
+  channels: Array<Channel>
+  // activeChannel: Channel
+  // activeQuestion?: Question
+  onQuestionAsked: (channelId: string, question: string) => void
+  onQuestionAnswered: (channelId: string, questionId: string, content: string) => void
+  toggleAnswerMode: (q: string) => void
 }
 
-export default messages
+interface MessagesState {
+  currentMessage: string
+}
+
+class Messages extends React.Component<MessagesProps, MessagesState> {
+
+  state: MessagesState = {
+    currentMessage: ''
+  }
+
+  render(){
+    return (
+      <Layout {...this.props}>
+        <div className="messages_container">
+          <div className="messages_body">
+            <div className="message_list_scroll">
+              {
+                this.props.channel.questions &&
+                this.props.channel.questions.map((question, index) => this.renderQuestion(question, index))
+              }                      
+            </div>
+          </div>
+          <footer className="messages_footer">
+            <form onSubmit={this.sendMessage}>
+              <MessageInput placeholder="Ask a question on #Channel" value={this.state.currentMessage} onChange={this.updateQuestion} />
+            </form>
+            <div className="messagesContainer_notifBar" />
+          </footer>
+        </div>
+      </Layout>
+    )   
+  }
+
+  updateQuestion = (currentMessage: string) => {
+    this.setState({ currentMessage });
+  }
+
+  sendMessage = (event: any) => {
+    event.preventDefault();
+
+    //@todo
+  }
+
+  renderQuestion = (question: Question, index: number) => {
+    return <QuestionBlock question={question} key={index} toggleAnswerMode={this.props.toggleAnswerMode} />
+  }
+}
+
+export default Messages
