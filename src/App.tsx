@@ -103,19 +103,12 @@ class App extends React.Component<AppProps, AppState> {
 
   answerQuestion = (channelId: string, questionId: string, content: string) => {
     
-    console.log("#####")
-    console.log("channl: "+channelId)
-    console.log(questionId)
-    console.log(content)
-    console.log("#####")
+   
     const user = this.state.user ? this.state.user: {name:"Anonymous"}
     const answer: Answer = {user: user, content: content}
-    //this.state.channels.filter(h => (h.name === channelId)).forEach(e=>{
-    //  
-    //   e.questions.filter(z=>z.id === questionId).map(a=>a.answers.push(answer))}
-    //   );
+
     this.state.channels.filter(h => h.name === channelId).map(ch=>{
-      console.log("ici");
+      
       ch.questions.filter(q=>q.id === questionId).map(a=>a.answers.push(answer))})
     console.log(this.state.channels)
     this.setState({
