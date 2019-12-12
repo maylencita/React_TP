@@ -104,13 +104,19 @@ class App extends React.Component<AppProps, AppState> {
   answerQuestion = (channelId: string, questionId: string, content: string) => {
     
     console.log("#####")
-    console.log(channelId)
+    console.log("channl: "+channelId)
     console.log(questionId)
     console.log(content)
     console.log("#####")
     const user = this.state.user ? this.state.user: {name:"Anonymous"}
     const answer: Answer = {user: user, content: content}
-    this.state.channels.filter(h => h.name === channelId).map(ch=>ch.questions.filter(q=>q.id === questionId).map(a=>a.answers.push(answer)))
+    //this.state.channels.filter(h => (h.name === channelId)).forEach(e=>{
+    //  
+    //   e.questions.filter(z=>z.id === questionId).map(a=>a.answers.push(answer))}
+    //   );
+    this.state.channels.filter(h => h.name === channelId).map(ch=>{
+      console.log("ici");
+      ch.questions.filter(q=>q.id === questionId).map(a=>a.answers.push(answer))})
     console.log(this.state.channels)
     this.setState({
       channels: this.state.channels
@@ -122,12 +128,21 @@ class App extends React.Component<AppProps, AppState> {
 
   toggleAnswerMode = (activeQuestion: string) => {
     console.log("toogle app")
-    const q= this.state.activeChannel.questions.find(h => h.id ===activeQuestion)
-    if (q){
-      console.log(q)
+    if(this.state.activeQuestion){
+
+      delete this.state.activeQuestion
       this.setState({
-        activeQuestion: q
+        activeQuestion: this.state.activeQuestion
       })
+    }
+    else{ 
+      const q= this.state.activeChannel.questions.find(h => h.id ===activeQuestion)
+      if (q){
+        console.log(q)
+        this.setState({
+          activeQuestion: q
+        })
+      }
     }
 
   }

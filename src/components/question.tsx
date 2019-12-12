@@ -59,7 +59,7 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
   }
 
   renderAnswer = (answer: Answer, index: number) => (
-    <AnswerComponent userNickName="USER-NAME" userIcon="..." answerText="One Aswer: TODO" key={index} />
+    <AnswerComponent userNickName={answer.user.name} userIcon={answer.user.avatar ? answer.user.avatar: ":x"} answerText={answer.content} key={index} />
   )
 
   toggleAnswerMode = () => {

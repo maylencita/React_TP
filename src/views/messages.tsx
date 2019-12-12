@@ -66,7 +66,7 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
     const idd = this.props.activeQuestion;
     console.log(idd)
     if(idd){
-      this.props.onQuestionAnswered(idd.id ,this.props.channel.name, this.state.currentMessage)
+      this.props.onQuestionAnswered(this.props.channel.name, idd.id, this.state.currentMessage)
       this.state.currentMessage = ""
     }
 
