@@ -12,7 +12,10 @@ export type Question = {
   answers: Array<Answer>
 }
 
-export type Answer = {} //@TODO
+export type Answer = {
+  user: User
+  content: string
+} 
  
 export const DefaultChannel: Channel = { 
   name: 'general',

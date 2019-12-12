@@ -7,10 +7,11 @@ import { Channel, Question } from '../models'
 
 interface MessagesProps {
   appName: string,
+
   channel: Channel
   channels: Array<Channel>
-  // activeChannel: Channel
-  // activeQuestion?: Question
+  //activeChannel: Channel
+  activeQuestion?: Question
   onQuestionAsked: (channelId: string, question: string) => void
   onQuestionAnswered: (channelId: string, questionId: string, content: string) => void
   toggleAnswerMode: (q: string) => void
@@ -28,7 +29,7 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
 
   render(){
     return (
-      <Layout {...this.props}>
+      <Layout {...this.props} activeChannel={this.props.channel}>
         <div className="messages_container">
           <div className="messages_body">
             <div className="message_list_scroll">
@@ -39,8 +40,9 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
             </div>
           </div>
           <footer className="messages_footer">
-            <form onSubmit={this.sendMessage}>
-              <MessageInput placeholder="Ask a question on #Channel" value={this.state.currentMessage} onChange={this.updateQuestion} />
+            <form onSubmit={this.props.activeQuestion ? this.sendAnswer:this.sendMessage}>
+           
+              <MessageInput placeholder={this.props.activeQuestion ? "Ask a question on #Question" : "Ask a question on #Channel"} value={this.state.currentMessage} onChange={this.updateQuestion} />
             </form>
             <div className="messagesContainer_notifBar" />
           </footer>
@@ -55,9 +57,22 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
 
   sendMessage = (event: any) => {
     event.preventDefault();
-
-    //@todo
+    this.props.onQuestionAsked(this.props.channel.name, this.state.currentMessage)
+    this.state.currentMessage = ""
+    console.log("send message")
   }
+  sendAnswer = (event: any) => {
+    event.preventDefault();
+    const idd = this.props.activeQuestion;
+    console.log(idd)
+    if(idd){
+      this.props.onQuestionAnswered(idd.id ,this.props.channel.name, this.state.currentMessage)
+      this.state.currentMessage = ""
+    }
+
+    console.log("send answer")
+  }
+  
 
   renderQuestion = (question: Question, index: number) => {
     return <QuestionBlock question={question} key={index} toggleAnswerMode={this.props.toggleAnswerMode} />

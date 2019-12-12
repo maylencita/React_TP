@@ -10,10 +10,11 @@ interface QuestionProps {
 }
 
 interface QuestionState {
+  points: number
 }
 
 class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
-  state: QuestionState = {}
+  state: QuestionState = {points: 0}
 
   render() {
     return (
@@ -39,7 +40,7 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
           </div>
         </div>    
         <div className="message_buttons">
-          <span className="message_buttons_points">0</span>
+            <span className="message_buttons_points">{this.state.points}</span>
           <button className="message_buttons_addPoints" onClick={this.addPoints}>+1</button>
           <span className="question_buttons_answer" onClick={this.toggleAnswerMode}>A</span>
         </div>
@@ -48,7 +49,13 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
   }  
 
   addPoints = () => {
-    //@TODO
+    if(this.state.points<5){
+      this.setState(
+        {points: this.state.points+1}
+        );
+
+    }
+    
   }
 
   renderAnswer = (answer: Answer, index: number) => (
@@ -57,6 +64,7 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
 
   toggleAnswerMode = () => {
     this.props.toggleAnswerMode(this.props.question.id)
+    console.log("toogle")
   }
 
 }

@@ -9,14 +9,16 @@ interface ChannelProps {
 export default class ChannelSidebar extends React.Component<ChannelProps, {} > {
 
   render() {
+    
     return (
       <div className="sideBar_channels">
         <h2 className="sideBar_channels_title">
-          Channels <button className="addButton sideBar_channels_add">+</button>
+          Channels <Link to="/newchannel"><button className="addButton sideBar_channels_add">+</button></Link>
         </h2>
         <ul>
         {
           this.props.channels.map(this.renderChannelLink)
+          
         }
         </ul>
       </div>  
@@ -25,6 +27,7 @@ export default class ChannelSidebar extends React.Component<ChannelProps, {} > {
 
   renderChannelLink = (channel: Channel, index: number) => {
     return (
+      
       <li key={index}>
         <Link to={`/messages/${channel.name}`} className="sideBar_channel sideBar_channels_link" key={index}># {channel.name}</Link>
       </li>

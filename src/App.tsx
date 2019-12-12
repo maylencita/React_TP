@@ -11,15 +11,16 @@ import './index.css';
 import Home from './views/home'
 import Messages from './views/messages'
 import NewChannel from './views/newChannel'
-import { Channel, DefaultChannel, User, DefaultUser } from './models'
+import { Channel, DefaultChannel, User, DefaultUser, Question, Answer } from './models'
+import { AnyARecord } from 'dns';
 
 interface AppState {
   users: Array<User>
   channels: Array<Channel>
   serverStatus: string
   user?: User
-  // activeChannel: Channel //@Todo
-  // activeQuestion: Question //@Todo
+  activeChannel: Channel
+  activeQuestion: Question //@Todo
 }
 
 interface AppProps {
@@ -41,7 +42,8 @@ class App extends React.Component<AppProps, AppState> {
       <Router>
         <div className="app">
           <Switch>
-            <Route path="/messages/:channelId" children={<this.MessagesRoute />} />              
+            <Route path="/messages/:channelId" children={<this.MessagesRoute />} />
+                        
             <Route path="/newChannel" >
               <NewChannel onNewChannel={ this.addChannel }/>
             </Route>
@@ -55,9 +57,11 @@ class App extends React.Component<AppProps, AppState> {
   MessagesRoute = () => {
     let { channelId } = useParams();
     let channel = (channelId && this.state.channels.find(c => c.name === channelId)) || this.state.channels.find(c => c.name === 'general');
-
-    if (channel)
-      return <Messages onQuestionAsked={this.addQuestion} onQuestionAnswered={this.answerQuestion} channel={ channel } toggleAnswerMode={this.toggleAnswerMode} {...this.props} {...this.state}/>
+    
+    if (channel){
+      this.state.activeChannel = channel
+      return <Messages activeQuestion={this.state.activeQuestion} onQuestionAsked={this.addQuestion} onQuestionAnswered={this.answerQuestion} channel={ channel } toggleAnswerMode={this.toggleAnswerMode} {...this.props} {...this.state}/>
+    }
     else return null;
   }
 
@@ -77,19 +81,55 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   addChannel = (channelName: string) => {    
-    //@TODO
+    const nouvelle = {name: channelName, questions: [] as Question[]}
+    this.setState({
+      channels: [...this.state.channels, nouvelle]
+    })
+    
   } 
 
   addQuestion = (channelId: string, questionText: string) => {
-    //@TODO
+    const user = this.state.user ? this.state.user: {name:"Anonymous"}
+    const idd = this.state.channels.filter(h=> h.name === channelId)[0].questions.length +1
+    const q: Question = {id:""+idd , user: user, content: questionText, answers:[] as Answer[]}
+    this.state.channels.filter(h => h.name === channelId).map(l=> l.questions.push(q));
+    this.setState({
+      channels: this.state.channels
+    }
+      
+      
+    )
   }
 
   answerQuestion = (channelId: string, questionId: string, content: string) => {
-    //@TODO
+    
+    console.log("#####")
+    console.log(channelId)
+    console.log(questionId)
+    console.log(content)
+    console.log("#####")
+    const user = this.state.user ? this.state.user: {name:"Anonymous"}
+    const answer: Answer = {user: user, content: content}
+    this.state.channels.filter(h => h.name === channelId).map(ch=>ch.questions.filter(q=>q.id === questionId).map(a=>a.answers.push(answer)))
+    console.log(this.state.channels)
+    this.setState({
+      channels: this.state.channels
+    }
+      
+      
+    )
   }
 
   toggleAnswerMode = (activeQuestion: string) => {
-    //@TODO
+    console.log("toogle app")
+    const q= this.state.activeChannel.questions.find(h => h.id ===activeQuestion)
+    if (q){
+      console.log(q)
+      this.setState({
+        activeQuestion: q
+      })
+    }
+
   }
 }
 
