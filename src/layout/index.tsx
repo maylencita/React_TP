@@ -10,7 +10,9 @@ interface LayoutProps {
   serverStatus?: string
   user?: User
   channels: Array<Channel>
-  // activeChannel: Channel
+  activeChannel: Channel
+
+  onSync: () => void
 }
 
 const layout = (props: LayoutProps) => {
@@ -18,18 +20,21 @@ const layout = (props: LayoutProps) => {
     <div className="container">
       <div className="top_nav">
         <div className="app_title">
-          <Link to="/"> <h1>{props.appName}</h1> </Link>
+          <Link to="/addUser"> <h1>{props.appName}</h1> </Link>
           {
             (props.user && <div> [<span>{props.user.avatar}</span>] <span>{props.user.name}</span></div>) ||
           <div>[?_?] Anonymous</div> 
           }
         </div>
         <div className="chanel_header">
-          <h2># Channel name here </h2>
+          <h2>#{props.activeChannel.name}</h2>
         </div>
       </div>
       <div className="sidebar">
-        <ChannelSidebar {...props}/>
+        <ChannelSidebar {...props} />
+        <div className="home_buttonsWrapper" onClick={props.onSync}>
+          <button > <img src="http://localhost:3001/images/reload.svg" width="15px" height="15px" alt="sync" /> </button>
+        </div>
       </div>
       <div className="primary_view">
         <div className="primary_view_container">

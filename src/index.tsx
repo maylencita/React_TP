@@ -5,7 +5,7 @@ import registerServiceWorker from './registerServiceWorker'
 import './index.css';
 
 ReactDOM.render(
-  <App appName="TCHIT TCHAT"/>,
+  <App appName="MY CHAT"/>,
   document.getElementById('root') as HTMLElement
 );
 registerServiceWorker();

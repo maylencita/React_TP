@@ -5,6 +5,13 @@ export type Channel = {
   questions: Array<Question>
 }
 
+export type ServiceState = {
+  users: Array<User>
+  channels: Array<Channel>
+  serverStatus: string
+  user?: User
+}
+
 export type Question = {
   id: string
   user: User

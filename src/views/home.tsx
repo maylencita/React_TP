@@ -11,6 +11,8 @@ interface HomeProps {
   channels: Array<Channel>
   onUpdateUser: (user: User) => void
   history: any
+
+  onSync: () => void
 }
 
 type HomeState = {
@@ -28,7 +30,7 @@ class home extends React.Component<HomeProps, HomeState> {
 
   render() {
     return (
-      <Layout {...this.props}>
+      <Layout {...this.props} activeChannel={this.props.channels[0]} >
         <div className="homeView">
           <form onSubmit={this.updateUser}>
             <h3> WELCOME TO {this.props.appName} </h3>

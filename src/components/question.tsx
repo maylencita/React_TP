@@ -2,18 +2,22 @@ import * as React from 'react'
 
 import AnswerComponent from './answer'
 import { UserIcon } from './user'
-import { Question, Answer } from '../models';
+import { Question, Answer, Channel } from '../models';
 
 interface QuestionProps {
   question: Question
-  toggleAnswerMode: (q: string) => void
+  channel: Channel
+  toggleAnswerMode: (channelId: string, q: string) => void
 }
 
 interface QuestionState {
+  points: number
 }
 
 class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
-  state: QuestionState = {}
+  state: QuestionState = {
+    points: 0
+  }
 
   render() {
     return (
@@ -56,7 +60,7 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
   )
 
   toggleAnswerMode = () => {
-    this.props.toggleAnswerMode(this.props.question.id)
+    this.props.toggleAnswerMode(this.props.channel.name, this.props.question.id)
   }
 
 }

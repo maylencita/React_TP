@@ -13,7 +13,8 @@ interface MessagesProps {
   // activeQuestion?: Question
   onQuestionAsked: (channelId: string, question: string) => void
   onQuestionAnswered: (channelId: string, questionId: string, content: string) => void
-  toggleAnswerMode: (q: string) => void
+  toggleAnswerMode: (channelId: string, q: string) => void
+  onSync: () => void
 }
 
 interface MessagesState {
@@ -28,7 +29,7 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
 
   render(){
     return (
-      <Layout {...this.props}>
+      <Layout {...this.props} activeChannel={this.props.channel} >
         <div className="messages_container">
           <div className="messages_body">
             <div className="message_list_scroll">
@@ -56,11 +57,15 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
   sendMessage = (event: any) => {
     event.preventDefault();
 
-    //@todo
+    this.props.onQuestionAsked(this.props.channel.name, this.state.currentMessage);
+
+    this.setState({
+      currentMessage: ''
+    })
   }
 
   renderQuestion = (question: Question, index: number) => {
-    return <QuestionBlock question={question} key={index} toggleAnswerMode={this.props.toggleAnswerMode} />
+    return <QuestionBlock channel={this.props.channel} question={question} key={index} toggleAnswerMode={this.props.toggleAnswerMode} />
   }
 }
 

@@ -11,7 +11,11 @@ import './index.css';
 import Home from './views/home'
 import Messages from './views/messages'
 import NewChannel from './views/newChannel'
-import { Channel, DefaultChannel, User, DefaultUser } from './models'
+import Login from './views/login'
+import { Channel, DefaultChannel, User, DefaultUser, Question, Answer } from './models'
+import ChatService from './httpService';
+
+const chatService = new ChatService()
 
 interface AppState {
   users: Array<User>
@@ -41,10 +45,12 @@ class App extends React.Component<AppProps, AppState> {
       <Router>
         <div className="app">
           <Switch>
-            <Route path="/messages/:channelId" children={<this.MessagesRoute />} />              
+            <Route path="/messages/:channelId" children={ < this.MessagesRoute /> } />              
             <Route path="/newChannel" >
               <NewChannel onNewChannel={ this.addChannel }/>
             </Route>
+            <Route path="/login" children={ this.LoginRoute } />
+            <Route path="/addUser" children={this.AddUserRoute} />
             <Route path="/" children={ this.HomeRoute } />              
           </Switch>
         </div>
@@ -57,7 +63,14 @@ class App extends React.Component<AppProps, AppState> {
     let channel = (channelId && this.state.channels.find(c => c.name === channelId)) || this.state.channels.find(c => c.name === 'general');
 
     if (channel)
-      return <Messages onQuestionAsked={this.addQuestion} onQuestionAnswered={this.answerQuestion} channel={ channel } toggleAnswerMode={this.toggleAnswerMode} {...this.props} {...this.state}/>
+      return <Messages onSync={this.handleSync} onQuestionAsked={this.addQuestion} onQuestionAnswered={this.answerQuestion} channel={ channel } toggleAnswerMode={this.toggleAnswerMode} {...this.props} {...this.state}/>
+    else return null;
+  }
+
+  HomeRoute = () => {
+    let channel = this.state.channels.find(c => c.name === 'general')
+    if (channel)
+      return <Messages onSync={this.handleSync} onQuestionAsked={this.addQuestion} onQuestionAnswered={this.answerQuestion} channel={ channel } toggleAnswerMode={this.toggleAnswerMode} {...this.props} {...this.state}/>    
     else return null;
   }
 
@@ -65,30 +78,79 @@ class App extends React.Component<AppProps, AppState> {
     return <NewChannel onNewChannel={this.addChannel} {...props} />
   }
 
-  HomeRoute = (props: { history: H.History}) => {
-    return <Home onUpdateUser={this.setUser} {...this.props} {...props} {...this.state} />
+  LoginRoute = (props: { history: H.History }) => {
+    return <Login onLogin={this.handleLogin} history={props.history} />
   }
 
-  setUser = (user: User) => {
-    let existingUser = this.state.users.find(u => u.name === user.name)
-    let users = !existingUser ? [ ...this.state.users,  user] : this.state.users;
+  AddUserRoute = (props: { history: H.History}) => {
+    return <Home onUpdateUser={this.addUser} onSync={this.handleSync} {...this.props} {...props} {...this.state} />
+  }
 
-    this.setState({ user, users})
+  addUser = (user: User) => {
+    chatService.addUser(user)
+    .then(users => this.setState({users}))
+    .catch(error => alert(`Could not create user: ${error.error}`))
   }
 
   addChannel = (channelName: string) => {    
-    //@TODO
+    let newChannel = {name: channelName, questions: [] as Question[]}
+    this.setState((state) => ({
+      channels: [...state.channels, newChannel]
+    }))
   } 
 
   addQuestion = (channelId: string, questionText: string) => {
-    //@TODO
+    let updateChannel = (id: string, user: User, channel: Channel) => ({
+      ...channel, 
+      questions: [...channel.questions, {
+        id, 
+        user, 
+        content: questionText, 
+        answers: [] as Answer[]
+      }]
+    })
+
+    let channel = this.state.channels.find(c => c.name === channelId)
+
+    if(channel && this.state.user){
+      let user = this.state.user
+      let id: string = `q${channel.questions.length + 1}`
+      let updatedChannels: Channel[] = this.state.channels.map(channel => {
+        return channel.name === channelId ? updateChannel(id, user, channel) : channel
+      })  
+
+      this.setState({
+        channels: updatedChannels
+      })  
+    }
+  }
+
+  handleLogin = (userName: string) => {
+    chatService.loginUser(userName)
+    .then(this.updateState)
+    .catch(err => alert(`Oops ${err.error}`))
+  }
+
+  updateState = (state: AppState) => {
+    this.setState(state)
+  }
+
+  updateChannels = (channels: Array<Channel>) => {
+    this.setState(state => ({
+      channels
+    }))
+  }
+
+  handleSync = () => {
+    chatService.syncChannels()
+    .then(this.updateChannels)
   }
 
   answerQuestion = (channelId: string, questionId: string, content: string) => {
     //@TODO
   }
 
-  toggleAnswerMode = (activeQuestion: string) => {
+  toggleAnswerMode = (channelId: string, activeQuestion: string) => {
     //@TODO
   }
 }

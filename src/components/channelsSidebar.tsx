@@ -12,7 +12,7 @@ export default class ChannelSidebar extends React.Component<ChannelProps, {} > {
     return (
       <div className="sideBar_channels">
         <h2 className="sideBar_channels_title">
-          Channels <button className="addButton sideBar_channels_add">+</button>
+          Channels <Link to="/newChannel"> <button className="addButton sideBar_channels_add">+</button> </Link>
         </h2>
         <ul>
         {
