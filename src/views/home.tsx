@@ -52,7 +52,7 @@ class home extends React.Component<HomeProps, HomeState> {
 
   updateUser = (event: any) => {
     event.preventDefault();
-
+    
     this.props.onUpdateUser(this.state);
     this.props.history.push('/messages/general');
   }

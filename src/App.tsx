@@ -11,8 +11,14 @@ import './index.css';
 import Home from './views/home'
 import Messages from './views/messages'
 import NewChannel from './views/newChannel'
+import NewLogin from './views/newLogin'
+
 import { Channel, DefaultChannel, User, DefaultUser, Question, Answer } from './models'
 import { AnyARecord } from 'dns';
+import ChatService from './httpService';
+
+
+const chatService = new ChatService()
 
 interface AppState {
   users: Array<User>
@@ -29,6 +35,9 @@ interface AppProps {
 
 class App extends React.Component<AppProps, AppState> {
 
+  
+
+
   // private timerID: NodeJS.Timer | number
 
   state: AppState = {
@@ -42,12 +51,15 @@ class App extends React.Component<AppProps, AppState> {
       <Router>
         <div className="app">
           <Switch>
+          
             <Route path="/messages/:channelId" children={<this.MessagesRoute />} />
                         
             <Route path="/newChannel" >
               <NewChannel onNewChannel={ this.addChannel }/>
             </Route>
-            <Route path="/" children={ this.HomeRoute } />              
+            <Route path="/addUser" children={ this.HomeRoute } />  
+            <Route path="/" children={this.NewLoginRoute} />
+                        
           </Switch>
         </div>
       </Router>
@@ -68,17 +80,28 @@ class App extends React.Component<AppProps, AppState> {
   NewChannelRoute = (props: { history: H.History}) => {
     return <NewChannel onNewChannel={this.addChannel} {...props} />
   }
+  NewLoginRoute = (props: { history: H.History}) => {
+    return <NewLogin history={props.history} onNewLogin={this.addLogin} {...props} />
+  }
 
   HomeRoute = (props: { history: H.History}) => {
     return <Home onUpdateUser={this.setUser} {...this.props} {...props} {...this.state} />
   }
 
   setUser = (user: User) => {
-    let existingUser = this.state.users.find(u => u.name === user.name)
-    let users = !existingUser ? [ ...this.state.users,  user] : this.state.users;
-
-    this.setState({ user, users})
+    console.log("setUser")
+    //let existingUser = this.state.users.find(u => u.name === user.name)
+    //let users = !existingUser ? [ ...this.state.users,  user] : this.state.users;
+    chatService.addUser(user).then((users)=>{
+      console.log(users)
+      this.setState({
+        users
+      })
+    })
+    .catch((err)=>console.log(err))
+    
   }
+ 
 
   addChannel = (channelName: string) => {    
     const nouvelle = {name: channelName, questions: [] as Question[]}
@@ -87,6 +110,15 @@ class App extends React.Component<AppProps, AppState> {
     })
     
   } 
+  addLogin = (login: string, h: H.History) => {
+    if(this.state.users.filter(u=>u.name===login).length>0){
+      console.log("connected")
+      h.push('/messages/general')
+    }
+    else{
+      alert("Unknown user")
+    }
+  }
 
   addQuestion = (channelId: string, questionText: string) => {
     const user = this.state.user ? this.state.user: {name:"Anonymous"}

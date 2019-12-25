@@ -16,6 +16,9 @@ export type Answer = {
   user: User
   content: string
 } 
+export type ServiceState={
+
+}
  
 export const DefaultChannel: Channel = { 
   name: 'general',

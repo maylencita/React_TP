@@ -19,7 +19,7 @@ const layout = (props: LayoutProps) => {
     <div className="container">
       <div className="top_nav">
         <div className="app_title">
-          <Link to="/"> <h1>{props.appName}</h1> </Link>
+          <Link to="/addUser"> <h1>{props.appName}</h1> </Link>
           {
             (props.user && <div> [<span>{props.user.avatar}</span>] <span>{props.user.name}</span></div>) ||
           <div>[?_?] Anonymous</div> 
