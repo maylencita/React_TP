@@ -113,7 +113,7 @@ class App extends React.Component<AppProps, AppState> {
     
   } 
   addLogin = (login: string, h:H.History) => {
-    this.getChannel();
+    
     chatService.loginUser(login)
     .then((state)=>{
       h.push('messages/general')
@@ -129,7 +129,7 @@ class App extends React.Component<AppProps, AppState> {
   updateState = (state: AppState) => {
     this.setState(state)
   }
-
+  
   addQuestion = (channelId: string, questionText: string) => {
     const user = this.state.user ? this.state.user: {name:"Anonymous"}
     const idd = this.state.channels.filter(h=> h.name === channelId)[0].questions.length +1
