@@ -112,21 +112,22 @@ class App extends React.Component<AppProps, AppState> {
     })
     
   } 
-  addLogin = (login: string, h: H.History) => {
-    chatService.loginUser(login).then(
-      (state)=>{
-        console.log(state)
-        this.setState(state)
-      }
-    )
-    .catch((err)=>console.log(err))
-    if(this.state.user && this.state.user.name===login){
-      console.log("connected")
-      h.push('/messages/general')
-    }
-    else{
-      alert("Unknown user")
-    }
+  addLogin = (login: string, h:H.History) => {
+    this.getChannel();
+    chatService.loginUser(login)
+    .then((state)=>{
+      h.push('messages/general')
+      return state
+    })
+    .then((state)=>{
+      
+      this.updateState(state)})
+    .catch(err => alert(`Oops ${err.error}`))
+    
+
+  }
+  updateState = (state: AppState) => {
+    this.setState(state)
   }
 
   addQuestion = (channelId: string, questionText: string) => {
