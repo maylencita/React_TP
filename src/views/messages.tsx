@@ -7,7 +7,7 @@ import { Channel, Question } from '../models'
 
 interface MessagesProps {
   appName: string,
-
+  onSync: () => void
   channel: Channel
   channels: Array<Channel>
   //activeChannel: Channel
@@ -15,6 +15,7 @@ interface MessagesProps {
   onQuestionAsked: (channelId: string, question: string) => void
   onQuestionAnswered: (channelId: string, questionId: string, content: string) => void
   toggleAnswerMode: (q: string) => void
+  addP: (q: Question) => void
 }
 
 interface MessagesState {
@@ -29,7 +30,7 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
 
   render(){
     return (
-      <Layout {...this.props} activeChannel={this.props.channel}>
+      <Layout {...this.props} onSync={this.props.onSync} activeChannel={this.props.channel}>
         <div className="messages_container">
           <div className="messages_body">
             <div className="message_list_scroll">
@@ -42,7 +43,7 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
           <footer className="messages_footer">
             <form onSubmit={this.props.activeQuestion ? this.sendAnswer:this.sendMessage}>
            
-              <MessageInput placeholder={this.props.activeQuestion ? "Ask a question on #Question" : "Ask a question on #Channel"} value={this.state.currentMessage} onChange={this.updateQuestion} />
+              <MessageInput placeholder={this.props.activeQuestion ? "Answer to #Question" : "Ask a question on #Channel"} value={this.state.currentMessage} onChange={this.updateQuestion} />
             </form>
             <div className="messagesContainer_notifBar" />
           </footer>
@@ -75,7 +76,7 @@ class Messages extends React.Component<MessagesProps, MessagesState> {
   
 
   renderQuestion = (question: Question, index: number) => {
-    return <QuestionBlock question={question} key={index} toggleAnswerMode={this.props.toggleAnswerMode} />
+    return <QuestionBlock addP={this.props.addP} question={question} key={index} toggleAnswerMode={this.props.toggleAnswerMode} />
   }
 }
 

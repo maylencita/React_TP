@@ -11,6 +11,7 @@ interface LayoutProps {
   serverStatus?: string
   user?: User
   channels: Array<Channel>
+  onSync: ()=> void
   // activeChannel: Channel
 }
 
@@ -31,6 +32,9 @@ const layout = (props: LayoutProps) => {
       </div>
       <div className="sidebar">
         <ChannelSidebar {...props}/>
+        <div className="home_buttonsWrapper" onClick={props.onSync}>
+          <button > <img src="http://localhost:3001/images/reload.svg" width="15px" height="15px" alt="sync" /> </button>
+        </div>
       </div>
       <div className="primary_view">
         <div className="primary_view_container">

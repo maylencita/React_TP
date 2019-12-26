@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import * as H from 'history';
 
 interface ChannelFormState {
   channelName: string
+  
 }
 
 interface ChannelFormProps {
-  onNewChannel: (name: string) => void
+  onNewChannel: (name: string, h: H.History) => void
+  history: H.History
 }
 
 class NewChannelForm extends React.Component<ChannelFormProps, ChannelFormState> {
@@ -48,7 +51,7 @@ class NewChannelForm extends React.Component<ChannelFormProps, ChannelFormState>
   }
 
   handleAddChannel = (event: any) => {
-    this.props.onNewChannel(this.state.channelName)
+    this.props.onNewChannel(this.state.channelName,this.props.history)
     event.preventDefault();
   }
 }

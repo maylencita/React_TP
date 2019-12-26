@@ -7,6 +7,7 @@ import { Question, Answer } from '../models';
 interface QuestionProps {
   question: Question
   toggleAnswerMode: (q: string) => void
+  addP: (question: Question) => void
 }
 
 interface QuestionState {
@@ -14,7 +15,7 @@ interface QuestionState {
 }
 
 class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
-  state: QuestionState = {points: 0}
+  state: QuestionState = {points: this.props.question.note? this.props.question.note : 0}
 
   render() {
     return (
@@ -40,7 +41,7 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
           </div>
         </div>    
         <div className="message_buttons">
-            <span className="message_buttons_points">{this.state.points}</span>
+            <span className="message_buttons_points">{this.props.question.note ?this.props.question.note: 0 }</span>
           <button className="message_buttons_addPoints" onClick={this.addPoints}>+1</button>
           <span className="question_buttons_answer" onClick={this.toggleAnswerMode}>A</span>
         </div>
@@ -49,12 +50,28 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
   }  
 
   addPoints = () => {
-    if(this.state.points<5){
+    console.log(this.props.question)
+    if(this.props.question.note && this.props.question.note<5){
       this.setState(
         {points: this.state.points+1}
         );
-
+      this.props.addP(this.props.question);
     }
+    else{
+      if(this.state.points<5){
+        this.setState(
+          {points: this.state.points+1}
+          );
+        this.props.addP(this.props.question);
+  
+      
+        }
+    }
+
+
+
+
+   
     
   }
 

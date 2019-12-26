@@ -51,14 +51,14 @@ class App extends React.Component<AppProps, AppState> {
       <Router>
         <div className="app">
           <Switch>
-          
+            
             <Route path="/messages/:channelId" children={<this.MessagesRoute />} />
                         
-            <Route path="/newChannel" >
-              <NewChannel onNewChannel={ this.addChannel }/>
-            </Route>
+           
+            <Route path="/newChannel" children={ this.NewChannelRoute } />  
             <Route path="/addUser" children={ this.HomeRoute } />  
             <Route path="/" children={this.NewLoginRoute} />
+            
                         
           </Switch>
         </div>
@@ -72,20 +72,20 @@ class App extends React.Component<AppProps, AppState> {
     
     if (channel){
       this.state.activeChannel = channel
-      return <Messages activeQuestion={this.state.activeQuestion} onQuestionAsked={this.addQuestion} onQuestionAnswered={this.answerQuestion} channel={ channel } toggleAnswerMode={this.toggleAnswerMode} {...this.props} {...this.state}/>
+      return <Messages addP={this.addP} onSync={this.onSync} activeQuestion={this.state.activeQuestion} onQuestionAsked={this.addQuestion} onQuestionAnswered={this.answerQuestion} channel={ channel } toggleAnswerMode={this.toggleAnswerMode} {...this.props} {...this.state}/>
     }
     else return null;
   }
 
   NewChannelRoute = (props: { history: H.History}) => {
-    return <NewChannel onNewChannel={this.addChannel} {...props} />
+    return <NewChannel history={props.history} onNewChannel={this.addChannel} {...props} />
   }
   NewLoginRoute = (props: { history: H.History}) => {
     return <NewLogin history={props.history} onNewLogin={this.addLogin} {...props} />
   }
 
   HomeRoute = (props: { history: H.History}) => {
-    return <Home onUpdateUser={this.setUser} {...this.props} {...props} {...this.state} />
+    return <Home onSync={this.onSync} onUpdateUser={this.setUser} {...this.props} {...props} {...this.state} />
   }
 
   setUser = (user: User) => {
@@ -105,17 +105,31 @@ class App extends React.Component<AppProps, AppState> {
   }
  
 
-  addChannel = (channelName: string) => {    
+  addChannel = (channelName: string, h: H.History) => {    
     const nouvelle = {name: channelName, questions: [] as Question[]}
     this.setState({
       channels: [...this.state.channels, nouvelle]
     })
+    chatService.addChannel(nouvelle)
+    h.push('messages/general')
     
   } 
+  onSync = () => {
+    const name = this.state.user ?  this.state.user.name: "Admin"
+    chatService.loginUser(name)
+    .then((state) =>{
+      this.updateState(state)
+    })
+  }
+  addP = (q: Question) => {
+    q.note ? q.note = q.note+1: q.note=1;
+    chatService.addPoint(q.note ,q.id, this.state.activeChannel.name)
+  }
   addLogin = (login: string, h:H.History) => {
     
     chatService.loginUser(login)
     .then((state)=>{
+      console.log(state)
       h.push('messages/general')
       return state
     })
@@ -133,14 +147,13 @@ class App extends React.Component<AppProps, AppState> {
   addQuestion = (channelId: string, questionText: string) => {
     const user = this.state.user ? this.state.user: {name:"Anonymous"}
     const idd = this.state.channels.filter(h=> h.name === channelId)[0].questions.length +1
-    const q: Question = {id:""+idd , user: user, content: questionText, answers:[] as Answer[]}
+    const q: Question = {id:""+idd , user: user, content: questionText, answers:[] as Answer[], note: 0}
     this.state.channels.filter(h => h.name === channelId).map(l=> l.questions.push(q));
     this.setState({
       channels: this.state.channels
-    }
-      
-      
+    } 
     )
+    chatService.syncQuestions(channelId, q)
   }
 
   answerQuestion = (channelId: string, questionId: string, content: string) => {
@@ -159,6 +172,7 @@ class App extends React.Component<AppProps, AppState> {
       
       
     )
+    chatService.syncAnswer(channelId, questionId, answer)
   }
 
   toggleAnswerMode = (activeQuestion: string) => {

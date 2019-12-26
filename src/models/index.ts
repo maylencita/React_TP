@@ -10,6 +10,7 @@ export type Question = {
   user: User
   content: string
   answers: Array<Answer>
+  note?: number
 }
 
 export type Answer = {
@@ -17,6 +18,12 @@ export type Answer = {
   content: string
 } 
 export type ServiceState={
+  users: Array<User>
+  channels: Array<Channel>
+  serverStatus: string
+  user?: User
+  activeChannel: Channel
+  activeQuestion: Question
 
 }
  
