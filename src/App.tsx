@@ -92,11 +92,13 @@ class App extends React.Component<AppProps, AppState> {
     console.log("setUser")
     //let existingUser = this.state.users.find(u => u.name === user.name)
     //let users = !existingUser ? [ ...this.state.users,  user] : this.state.users;
-    chatService.addUser(user).then((users)=>{
+    chatService.addUser(user)
+    .then((users)=>{
       console.log(users)
       this.setState({
         users
       })
+      this.state.users = users
     })
     .catch((err)=>console.log(err))
     
@@ -111,7 +113,14 @@ class App extends React.Component<AppProps, AppState> {
     
   } 
   addLogin = (login: string, h: H.History) => {
-    if(this.state.users.filter(u=>u.name===login).length>0){
+    chatService.loginUser(login).then(
+      (state)=>{
+        console.log(state)
+        this.setState(state)
+      }
+    )
+    .catch((err)=>console.log(err))
+    if(this.state.user && this.state.user.name===login){
       console.log("connected")
       h.push('/messages/general')
     }
